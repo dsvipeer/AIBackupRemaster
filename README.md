@@ -12,14 +12,17 @@ Credits to him: [Mooreiche](https://github.com/Mooreiche/AIBackup)
 # **[PATROL UNIT PREVIEW](https://www.youtube.com/watch?v=gXKo5G4lU_4)**
 # **[AIR UNIT (NEW) - PREVIEW](https://www.youtube.com/watch?v=PcPQ2wpQlq0)**
 
-
+# **[DOWNLOAD HERE](https://github.com/dsvipeer/AIBackupRemaster/releases/tag/fivem)**
 
 
 # Installation: drag "AIBackupRemaster" to your server resources folder and add to your server.cfg "ensure AIBackupRemaster" 
 **[Do not rename the folder and copy the exactly name into the server.cfg]**
 
 > # To call Patrol Unit Backup: /aib or "+" in your NUMPAD 
+> # To cancel both backups press "-" in your NUMPAD 
 > # To call Air Unit: /aib2 
+> **[You are only able to call one of them, if you called air unit, you can't call patrol, and vice-versa]**
+> **[You are only able to call ONE unit, you can't call more than 1 patrol or 1 air unit]**
 > **[Only able to call Air Unit via chat command]**
 > **[Controller Support in this resource disabled to avoid issues while using controller]**
 
@@ -40,11 +43,8 @@ Credits to him: [Mooreiche](https://github.com/Mooreiche/AIBackup)
     
    **Air Unit will follow you realistically at safe height (always will overcome and pilot safe to follow professionally) and it's able to pilot between skyscrapers/tall buildings and will use spotlight at night being fully immersive**
 
-# **[AIR UNIT (NEW) - PREVIEW](https://www.youtube.com/watch?v=gXKo5G4lU_4)**
-
-
 # CONFIGURATION:
-   * **In the "variables" section, you ONLY can change these values:**
+   * **In the "variables" and "AddEventHandler" section, you can ONLY change these values:**
 
 
 ```
