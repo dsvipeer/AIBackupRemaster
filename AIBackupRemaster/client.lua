@@ -5,12 +5,12 @@
 --******************************************************
 
 -- variables --
-police        = GetHashKey('police3') -- You can add any vehicle here, replace or addon.
+police        = GetHashKey('police3')      -- You can add any vehicle here, replace or addon.
 policeman     = GetHashKey("s_m_y_cop_01") -- You can add any ped here.
-companyName   = "Dispatch" -- DO NOT TOUCH
-companyIcon   = "CHAR_CALL911" -- DO NOT TOUCH
-drivingStyle  = 537133628 -- https://www.vespura.com/fivem/drivingstyle/
-playerSpawned = false 
+companyName   = "Dispatch"                 -- DO NOT TOUCH
+companyIcon   = "CHAR_CALL911"             -- DO NOT TOUCH
+drivingStyle  = 537133628                  -- https://www.vespura.com/fivem/drivingstyle/
+playerSpawned = false
 active        = false
 arrived       = false
 vehicle       = nil
@@ -23,7 +23,7 @@ vehBlip       = nil
 RegisterNetEvent('POL:Spawn')
 
 
-    playerSpawned = true
+playerSpawned = true
 
 
 
@@ -31,8 +31,10 @@ Citizen.CreateThread(function()
     while true do
         Citizen.Wait(0)
         if playerSpawned then
-            if IsUsingKeyboard() and IsControlJustPressed(1, 314) then
-                TriggerEvent('POL:Spawn')
+            if (ESX.PlayerData.job and ESX.PlayerData.job.name == 'police') then
+                if IsUsingKeyboard() and IsControlJustPressed(1, 314) then
+                    TriggerEvent('POL:Spawn')
+                end
             end
         end
     end
@@ -42,8 +44,10 @@ Citizen.CreateThread(function()
     while true do
         Citizen.Wait(0)
         if playerSpawned then
-            if IsUsingKeyboard() and IsControlJustPressed(1, 315) then
-                LeaveScene()
+            if (ESX.PlayerData.job and ESX.PlayerData.job.name == 'police') then
+                if IsUsingKeyboard() and IsControlJustPressed(1, 315) then
+                    LeaveScene()
+                end
             end
         end
     end
@@ -73,7 +77,8 @@ AddEventHandler('POL:Spawn', function(player)
             end
 
             local offset = GetOffsetFromEntityInWorldCoords(player, 50, 50, 0)
-            local heading, spawn = GetNthClosestVehicleNodeFavourDirection(offset.x, offset.y, offset.z, pc.x, pc.y, pc.z, 20, 1, 0x40400000, 0)
+            local heading, spawn = GetNthClosestVehicleNodeFavourDirection(offset.x, offset.y, offset.z, pc.x, pc.y, pc
+                .z, 20, 1, 0x40400000, 0)
 
             vehicle = CreateVehicle(police, spawn.x, spawn.y, spawn.z, heading, true, true)
             driver_ped = CreatePedInsideVehicle(vehicle, 6, policeman, -1, true, true)
@@ -108,13 +113,14 @@ AddEventHandler('POL:Spawn', function(player)
             SetVehicleSiren(vehicle, true)
 
             local vehicleToFollow = GetVehiclePedIsIn(player, false)
-            local mode = -1  -- 0 for ahead, -1 = behind , 1 = left, 2 = right, 3 = back left, 4 = back right  
-            local speed = 50.0 -- Modify the backup maximum speed when following you.
-            local minDistance = 4.0 -- Default safe distance set by me, you can change it here.
-            local p7 = 0 -- Do not touch here
+            local mode = -1             -- 0 for ahead, -1 = behind , 1 = left, 2 = right, 3 = back left, 4 = back right
+            local speed = 50.0          -- Modify the backup maximum speed when following you.
+            local minDistance = 4.0     -- Default safe distance set by me, you can change it here.
+            local p7 = 0                -- Do not touch here
             local noRoadsDistance = 0.0 -- Do not touch here
 
-            TaskVehicleEscort(driver_ped, vehicle, vehicleToFollow, mode, speed, 537657916, minDistance, p7, noRoadsDistance)
+            TaskVehicleEscort(driver_ped, vehicle, vehicleToFollow, mode, speed, 537657916, minDistance, p7,
+                noRoadsDistance)
 
             ShowAdvancedNotification(companyIcon, companyName, "DISPATCH", "A Patrol Unit is heading to your location.")
 
@@ -139,8 +145,13 @@ end)
 -- command --
 RegisterCommand("aib", function()
     local player = PlayerPedId()
-    if player~=nil then
-        TriggerEvent('POL:Spawn', player)
+    if player ~= nil then
+        if (ESX.PlayerData.job and ESX.PlayerData.job.name == 'police') then
+            TriggerEvent('POL:Spawn', player)
+        else
+            ShowAdvancedNotification(companyIcon, companyName, "DISPATCH", "You aren't a police officer.")
+            return
+        end
     end
 end, false)
 
@@ -154,7 +165,7 @@ function EnterVehicle()
         TaskEnterVehicle(passenger_ped, vehicle, 2000, 0, 20, 1, 0)
         while GetIsTaskActive(passenger_ped, 160) do
             Wait(1)
-        end      
+        end
     end
 end
 
@@ -169,7 +180,7 @@ function LeaveVehicle()
         TaskLeaveVehicle(passenger_ped, vehicle, 0)
         while IsPedInAnyVehicle(passenger_ped, false) do
             Wait(1)
-        end	
+        end
     end
 end
 
@@ -177,19 +188,19 @@ function LeaveScene()
     if active then
         ShowAdvancedNotification(companyIcon, companyName, "DISPATCH", "Backup Dispatch has been cancelled.")
 
-        
+
         ClearPedTasksImmediately(driver_ped)
         ClearPedTasksImmediately(passenger_ped)
 
-        
-        TaskWarpPedIntoVehicle(driver_ped, vehicle, -1)
-        TaskWarpPedIntoVehicle(passenger_ped, vehicle, -2) 
 
-        
+        TaskWarpPedIntoVehicle(driver_ped, vehicle, -1)
+        TaskWarpPedIntoVehicle(passenger_ped, vehicle, -2)
+
+
         SetRelationshipBetweenGroups(0, GetPedRelationshipGroupHash(driver_ped), GetHashKey("PLAYER"))
         SetRelationshipBetweenGroups(0, GetPedRelationshipGroupHash(passenger_ped), GetHashKey("PLAYER"))
 
-        
+
         if DoesBlipExist(vehBlip) then
             RemoveBlip(vehBlip)
         end
@@ -203,18 +214,22 @@ function LeaveScene()
             SetEntityAsNoLongerNeeded(passenger_ped)
         end
 
-        
+
         active = false
         arrived = false
     end
 end
 
-
 -- command --
 RegisterCommand("aib2", function()
     local player = PlayerId()
     if player ~= nil then
-        TriggerEvent('POLMav:Spawn', player)
+        if (ESX.PlayerData.job and ESX.PlayerData.job.name == 'police') then
+            TriggerEvent('POLMav:Spawn', player)
+        else
+            ShowAdvancedNotification(companyIcon, companyName, "DISPATCH", "You aren't a police officer.")
+            return
+        end
     end
 end, false)
 
@@ -229,13 +244,14 @@ AddEventHandler('POLMav:Spawn', function(player)
         Citizen.CreateThread(function()
             active = true
             local pc = GetEntityCoords(GetPlayerPed(player))
-            local offset = GetOffsetFromEntityInWorldCoords(GetPlayerPed(player), 0, 0, 100) 
-            local heading, spawnPos = GetNthClosestVehicleNodeFavourDirection(offset.x, offset.y, offset.z, pc.x, pc.y, pc.z, 1, 1, 3.0, 0x40400000, 0)
+            local offset = GetOffsetFromEntityInWorldCoords(GetPlayerPed(player), 0, 0, 100)
+            local heading, spawnPos = GetNthClosestVehicleNodeFavourDirection(offset.x, offset.y, offset.z, pc.x, pc.y,
+                pc.z, 1, 1, 3.0, 0x40400000, 0)
 
-            
+
             local distanceToPlayer = #(spawnPos - pc)
             if distanceToPlayer < 50 then
-                spawnPos = pc + vector3(0, 0, 50) 
+                spawnPos = pc + vector3(0, 0, 50)
             end
 
             RequestModel("polmav")
@@ -260,14 +276,14 @@ AddEventHandler('POLMav:Spawn', function(player)
             SetModelAsNoLongerNeeded("s_m_m_pilot_02")
 
             SetVehicleEngineOn(vehicle, true, true, true)
-
+            ShowAdvancedNotification(companyIcon, companyName, "DISPATCH", "A Heli Unit is heading to your location.")
             local blip = AddBlipForEntity(vehicle)
-            SetBlipSprite(blip, 422) 
-            SetBlipColour(blip, 38) 
+            SetBlipSprite(blip, 422)
+            SetBlipColour(blip, 38)
             SetBlipFlashes(blip, true)
             SetBlipFlashTimer(blip, 500)
 
-            TaskVehicleFollow(driver_ped, vehicle, GetPlayerPed(player), 50.0, 2500, 33.0, 5) 
+            TaskVehicleFollow(driver_ped, vehicle, GetPlayerPed(player), 50.0, 2500, 33.0, 5)
 
             while active do
                 Citizen.Wait(0)
@@ -291,4 +307,3 @@ function ShowNotification(text)
     AddTextComponentString(text)
     DrawNotification(false, false)
 end
-
